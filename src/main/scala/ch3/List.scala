@@ -13,18 +13,67 @@ object List {
     case Cons(x,xs) => x * product(xs)
   }
 
-  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = {
     as match {
       case Nil => z
-      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+      case Cons(x, xs) =>
+        f(x, foldRight(xs, z)(f))
     }
+  }
+
+  // Got help on this one.
+  def foldRight2[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+    foldLeft(as, z)((b, a) => f(a,b))
 
   @annotation.tailrec
   def foldLeft[A,B](as: List[A], z: B)(f: (B, A) => B): B =
     as match {
       case Nil => z
-      case Cons(x, xs) => foldLeft(xs, f(z,x))(f)
+      case Cons(x, xs) =>
+        foldLeft(xs, f(z,x))(f)
     }
+
+  def map[A,B](as: List[A])(f: A => B): List[B] = as match {
+    case Nil => Nil
+    case Cons(x, xs) => Cons(f(x), map(xs)(f))
+  }
+
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    foldRight(as, Nil: List[A])((x, acc) => if(f(x)) Cons(x, acc) else acc)
+
+  def filter2[A](as: List[A])(f: A => Boolean): List[A] =
+    flatMap(as)(x => if(f(x)) List(x) else Nil)
+
+  def append[A](a1: List[A], a2: List[A]): List[A] = {
+    foldRight(a1, a2)((x, acc) => Cons(x, acc))
+  }
+
+  def flatten[A](as: List[List[A]]): List[A] = {
+    foldRight(as, Nil: List[A])((list, acc) => append(list, acc))
+  }
+
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = as match {
+    case Nil => Nil
+    case Cons(x, xs) => append(f(x), flatMap(xs)(f))
+  }
+
+  def addPairs(a1: List[Int], a2: List[Int]): List[Int] =
+    zipWith(a1, a2)(_ + _)
+
+  def zipWith[A,B](a1: List[A], a2: List[A])(f: (A,A) => B) : List[B] = (a1, a2) match {
+    // Ignoring edge cases for now
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(x1, xs1), Cons(x2, xs2)) => Cons(f(x1,x2), zipWith(xs1, xs2)(f))
+  }
+
+  def hasSubsequence[A](seq: List[A], subseq: List[A]): Boolean = {
+    Nil == foldLeft(seq, subseq) {
+      case (Cons(expected, remaining), current) =>
+        if(current == expected) remaining else subseq  // Starts over if a partial subseq match fails
+      case (Nil, _) => Nil
+    }
+  }
 
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
@@ -38,12 +87,14 @@ object List {
   def product3(ns: List[Double]) =
     foldLeft(ns, 1.0)(_ * _)
 
-  def reverse[A](as: List[A]): List[A] = as match {
-    case Nil => Nil
-    case Cons(x, Nil) => Cons(x, Nil)
-    case Cons(x1, Cons(x2, Nil)) => Cons(x2, Cons(x1, Nil))
-  }
+  def reverse[A](as: List[A]): List[A] =
+    foldLeft(as, Nil: List[A])((acc, x) => Cons(x, acc))
 
+  def addOneToAll(as: List[Int]): List[Int] =
+    foldRight(as, Nil: List[Int])((x, acc) => Cons(x + 1, acc))
+
+  def toStrings(as: List[Double]): List[String] =
+    foldRight(as, Nil: List[String])((x, acc) => Cons(x.toString, acc))
 
   def setHead[A](newHead: A, as: List[A]): List[A] = as match {
     case Nil => Cons(newHead, Nil)
