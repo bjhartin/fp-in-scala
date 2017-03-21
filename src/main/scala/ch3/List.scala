@@ -23,7 +23,7 @@ object List {
 
   // Got help on this one.
   def foldRight2[A,B](as: List[A], z: B)(f: (A, B) => B): B =
-    foldLeft(as, z)((b, a) => f(a,b))
+    foldLeft(reverse(as), z)((b, a) => f(a,b))
 
   @annotation.tailrec
   def foldLeft[A,B](as: List[A], z: B)(f: (B, A) => B): B =
