@@ -68,6 +68,24 @@ object List {
   }
 
   def hasSubsequence[A](seq: List[A], subseq: List[A]): Boolean = {
+    /*
+
+      Explanation of how this works:
+
+      First, a slight bit of syntax explanation.  I'm invoking foldLeft with a
+      a 'pattern matching anonymous function'.  It's just a syntax niceity, no
+      semantic difference.
+
+      What this does is try to match the current element with the first element
+      in the subsequence.  If it does not match, we try again with the next element
+      by recursing.  If it does match, we try again with the next element and
+      the *next element in the subsequence* by recursing *and dropping the head* of the subsequence.
+
+      If you try this imperatively with 'for' loops, arrays and two indices seq_ind and subseq_ind,
+      this step is equivalent to advancing subseq_ind on a match.
+     */
+
+
     Nil == foldLeft(seq, subseq) {
       case (Cons(expected, remaining), current) =>
         if(current == expected) remaining else subseq  // Starts over if a partial subseq match fails
