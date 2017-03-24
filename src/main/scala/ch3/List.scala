@@ -93,6 +93,9 @@ object List {
     }
   }
 
+  val x = scala.List(1).map(_.toString)
+  x.isEmpty
+
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
 
