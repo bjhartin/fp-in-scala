@@ -29,24 +29,34 @@ case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
 
 object Option {
-  def sequence[A](as: List[Option[A]]): Option[List[A]] = as match {
-    case Nil => None
-    case _ =>
+  def sequence[A](as: List[Option[A]]): Option[List[A]] =
       as.foldRight(Some(Nil): Option[List[A]]) {
         case (Some(elem), Some(acc)) => Some(elem :: acc)
         case _ => None
       }
-  }
 
   def sequence2[A](as: List[Option[A]]): Option[List[A]] = traverse(as)(identity)
 
-  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] = as match {
-    case Nil => None
-    case _ => as.foldRight(Some(Nil): Option[List[B]]) {(a, acc) =>
+  def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] =
+    as.foldLeft(Some(Nil): Option[List[B]]) {(acc, a) =>
       (f(a), acc) match {
         case (Some(b), Some(bs)) => Some(b :: bs)
         case _ => None
       }
-    }
-  }
+    }.map(_.reverse) // Ugh.
 }
+
+
+/*
+
+(1,2,3) foldLeft(Nil)(x*2)
+
+  f(1) :: Nil = (2)
+  f(2) :: (2) => (4,2)
+  f(3) :: (4,2) => (6,4,2)
+
+  f(1) :: Nil = (2)
+  f(2) :: (2) => (4,2)
+  f(3) :: (4,2) => (6,4,2)
+
+ */

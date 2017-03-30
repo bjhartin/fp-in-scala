@@ -5,7 +5,7 @@ sealed trait Either[+E, +A] {
 
   def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] = this match {
     case Right(a) => f(a)
-    case Left(e) => Left(e) // Compiler can't guess type for 'case l => l'
+    case l@Left(e) => l // Compiler can't guess type for 'case l => l'
   }
 
   def orElse[EE >: E,B >: A](b: => Either[EE, B]): Either[EE, B] = this match {
@@ -18,3 +18,16 @@ sealed trait Either[+E, +A] {
 
 case class Left[+E](value: E) extends Either[E, Nothing]
 case class Right[+A](value: A) extends Either[Nothing, A]
+
+object Either {
+  def sequence[E, A](as: List[Either[E, A]]): Either[E, List[A]] = traverse(as)(identity)
+
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    as.foldLeft(Right(Nil): Either[E, List[B]]) {(acc, a) =>
+      (f(a), acc) match {
+        case (Right(b), Right(bs)) => Right(b :: bs)
+        case (l@Left(e), Right(bs)) => l
+        case (_, l@Left(e)) => l // Necessary to preserve the first error
+      }
+    }.map(_.reverse) // Ugh.
+}
