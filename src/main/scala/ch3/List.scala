@@ -21,6 +21,13 @@ object List {
     }
   }
 
+  //  f = (a: A, as: List[A]): List[A] => a :: as
+  //  foldRight(List(1,2,3), Nil)(f)
+  //  f(1, foldRight(List(2,3), Nil)(f)) => 1 :: foldRight(List(2,3), Nil)(f))
+  //  f(2, foldRight(List(3), Nil)(f)) => 1 :: 2 :: foldRight(List(3), Nil)(f))
+  //  f(3, foldRight(Nil, Nil)(f)) => 1 :: 2 :: 3 :: foldRight(Nil, Nil)(f))
+  //  1 :: 2 :: 3 :: Nil
+
   // Got help on this one.
   def foldRight2[A,B](as: List[A], z: B)(f: (A, B) => B): B =
     foldLeft(reverse(as), z)((b, a) => f(a,b))
@@ -32,6 +39,13 @@ object List {
       case Cons(x, xs) =>
         foldLeft(xs, f(z,x))(f)
     }
+
+  //  f = (as: List[A], a: A): List[A] => a :: as
+  //  foldLeft(List(1,2,3), Nil)(f)
+  //  foldLeft(List(2,3), 1 :: Nil)(f)
+  //  foldLeft(List(3), 2 :: 1 :: Nil)(f)
+  //  foldLeft(Nil, 3 :: 2 :: 1 :: Nil)(f)
+  //  3 :: 2 :: 1 :: Nil
 
   def map[A,B](as: List[A])(f: A => B): List[B] = as match {
     case Nil => Nil

@@ -38,10 +38,10 @@ object Option {
   def sequence2[A](as: List[Option[A]]): Option[List[A]] = traverse(as)(identity)
 
   def traverse[A, B](as: List[A])(f: A => Option[B]): Option[List[B]] =
-    as.foldLeft(Some(Nil): Option[List[B]]) {(acc, a) =>
+    as.foldRight(Some(Nil): Option[List[B]]) {(a, acc) =>
       (f(a), acc) match {
         case (Some(b), Some(bs)) => Some(b :: bs)
         case _ => None
       }
-    }.map(_.reverse) // Ugh.
+    }
 }

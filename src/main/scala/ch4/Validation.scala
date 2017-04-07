@@ -10,7 +10,7 @@ sealed trait Validation[+E, +A] {
 
   def orElse[EE >: E,B >: A](b: => Validation[EE, B]): Validation[EE, B] = this match {
     case Failure(e) => b
-    case r => r
+    case success => success
   }
 
   def map2[EE >: E, B, C](b: Validation[EE, B])(f: (A, B) => C): Validation[EE, C] = flatMap(a => b.map(f(a,_)))
@@ -23,12 +23,12 @@ object Validation {
   def sequence[E, A](as: List[Validation[E, A]]): Validation[E, List[A]] = traverse(as)(identity)
 
   def traverse[E, A, B](as: List[A])(f: A => Validation[E, B]): Validation[E, List[B]] =
-    as.foldLeft(Success(Nil): Validation[E, List[B]]) {(acc, a) =>
+    as.foldRight(Success(Nil): Validation[E, List[B]]) {(a, acc) =>
       (f(a), acc) match {
         case (Success(b), Success(bs)) => Success(b :: bs)
         case (f@Failure(es), Success(bs)) => f // First error encountered
         case (Success(b), f@Failure(es)) => f // Preserves existing error
-        case (Failure(es1), Failure(es2)) => Failure(es2 ::: es1) // Accumulates errors
+        case (Failure(es1), Failure(es2)) => Failure(es1 ::: es2) // Accumulates errors
       }
-    }.map(_.reverse) // Ugh.
+    }
 }
