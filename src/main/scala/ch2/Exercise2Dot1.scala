@@ -1,3 +1,5 @@
+import scala.collection.immutable.{List => ScalaList}
+
 object Exercise2Dot1 extends App {
   override def main(args: Array[String]): Unit = {
     if(args.length != 1)
@@ -10,7 +12,7 @@ object Exercise2Dot1 extends App {
 
 
   @annotation.tailrec
-  private[this] def fibonacci(i: Int, fibs: List[Int] = List(1,0)): Int = {
+  private[this] def fibonacci(i: Int, fibs: ScalaList[Int] = ScalaList(1,0)): Int = {
     if(fibs.length == i)
       fibs.head
     else

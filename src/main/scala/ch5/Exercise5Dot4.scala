@@ -1,9 +1,9 @@
 package ch5
 
 object Exercise5Dot4 extends App {
-  assert(! Cons(() => 1, () => Cons(() => 2, () => Empty)).forAll(_ % 2 == 0))
+  assert(! Stream(1, 2).forAll(_ % 2 == 0))
 
-  assert(Cons(() => 2, () => Cons(() => 4, () => Empty)).forAll(_ % 2 == 0))
+  assert(Stream(2, 4).forAll(_ % 2 == 0))
 
   assert(Empty.forAll(_ => false))
 
