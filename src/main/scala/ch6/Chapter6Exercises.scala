@@ -46,8 +46,11 @@ object Chapter6Exercises extends App {
   assert(map2(int, randDouble)(f)(rng) == map2ViaFlatMap(int, randDouble)(f)(rng))
 
   //6.10
-  val s1 = Stateful({i:Int => (i+1, i*i)})
-  val s2 = Stateful({i:Int => (i+1, i/i)})
+  val s1 = Stateful {i:Int => (i+1, i*i)}
+  val s2 = Stateful {i:Int => (i+1, i/i)}
+  val s3 = Stateful {i:Int => (i+1, (i * 10).toString)}
 
+  assert(s1.map(_ + 1).run(1) == (2, 2))
+  assert(s1.flatMap {i: Int => s3}.run(1) == (3, "20"))
   assert(Stateful.sequence(List(s1, s2)).run(1) == (3, List(4, 1)))
 }
